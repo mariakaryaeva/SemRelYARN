@@ -2,32 +2,71 @@
 # -*- coding: utf-8 -*-
 
 import re
+import pymorphy2
 
-freq_file = open("1grams_nkrya_norm.txt", "r")
-freq_list = []
-freq = freq_file.readlines()
+def clear_wikionary_by_freq_list():
+    freq_file = open("1grams_nkrya_norm.txt", "r")
+    freq_list = []
+    freq = freq_file.readlines()
 
-count = 0
-while(count< 60000):
-    line = freq[count]
-    freq_list.append(re.split("\t",line)[0])
-    count = count + 1
+    count = 0
+    while(count< 60000):
+        line = freq[count]
+        freq_list.append(re.split("\t",line)[0])
+        count = count + 1
 
 
-wictionary_file = open("wikionary_hypernyms.txt", "r")
+    wictionary_file = open("wikionary_hypernyms.txt", "r")
 
-out_file = open("wikionary_clear_60k_freq.txt", "w")
-for line in wictionary_file:
-    word1 = re.split("#",line)[0].lower()
-    word2 = re.sub("\n", "", re.split("#", line)[1].lower())
-    if word1 in freq_list and word2 in freq_list:
-        out_file.write(line)
-out_file.close()
+    out_file = open("wikionary_clear_60k_freq.txt", "w")
+    for line in wictionary_file:
+        word1 = re.split("#",line)[0].lower()
+        word2 = re.sub("\n", "", re.split("#", line)[1].lower())
+        if word1 in freq_list and word2 in freq_list:
+            out_file.write(line)
+    out_file.close()
 
-out_r_file = open("wikionary_clear_60k_rod_freq.txt", "w")
-for line in wictionary_file:
-    word1 = re.split("#",line)[0].lower()
-    word2 = re.sub("\n", "", re.split("#", line)[1].lower())
-    if word1 in freq_list and word1!="имя":
-        out_r_file.write(line)
-out_r_file.close()
+    out_r_file = open("wikionary_clear_60k_rod_freq.txt", "w")
+    for line in wictionary_file:
+        word1 = re.split("#",line)[0].lower()
+        word2 = re.sub("\n", "", re.split("#", line)[1].lower())
+        if word1 in freq_list and word1!="имя":
+            out_r_file.write(line)
+    out_r_file.close()
+
+# берем словари
+# для каждой пары из викшинари находим "вид-род" в определении.
+# Выдаем пару и позицию (по словам) рода в определении
+def getsim():
+    d1 = open("UF_efremova_v2_40_out.txt", "r")
+    out_file = open("wikionary_pos_in_dict.txt", "w")
+    wictionary_file = open("wikionary_hypernyms.txt", "r")
+
+    wiki_list = []
+
+    for line in wictionary_file:
+        wiki_list.append(re.sub("\n", "", line)) # "РОД#ВИД"
+        # rod = re.split("#",line)[0]
+        # vid = re.split("#", line)[1]
+
+    morph = pymorphy2.MorphAnalyzer()
+
+    for line in d1:
+        words = re.findall(r'[а-яА-Я]+', line)
+
+        main_word = re.split(" - ",words)[0]
+        # main_word = (morph.parse(main_word)[0])
+        # main_word = main_word.normal_form
+        definition = re.split(" - ", words)[0]
+
+        for idx, word in enumerate(definition):
+            word = morph.parse(word)[0]
+            definition[idx] = word.normal_form
+
+        # for pair in wiki_list:
+        #     if pair[0] in definition and pair[1] == main_word:
+        #         print(pair)
+        #         print(main_word + " " + definition)
+
+getsim()
+
