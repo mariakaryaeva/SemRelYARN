@@ -37,36 +37,73 @@ def clear_wikionary_by_freq_list():
 # берем словари
 # для каждой пары из викшинари находим "вид-род" в определении.
 # Выдаем пару и позицию (по словам) рода в определении
+
+def getstr(list):
+    if len(list)==1:
+        return list[0]
+    else:
+        return ' '.join(list)
+
+
+
+
 def getsim():
     d1 = open("UF_efremova_v2_40_out.txt", "r")
     out_file = open("wikionary_pos_in_dict.txt", "w")
     wictionary_file = open("wikionary_hypernyms.txt", "r")
 
+    morph = pymorphy2.MorphAnalyzer()
+
     wiki_list = []
 
     for line in wictionary_file:
         wiki_list.append(re.sub("\n", "", line)) # "РОД#ВИД"
-        # rod = re.split("#",line)[0]
-        # vid = re.split("#", line)[1]
 
-    morph = pymorphy2.MorphAnalyzer()
+        rod = re.split("#",line)[0]
+        rod = re.split(" ",rod)
+        for idx, item in enumerate(rod):
+            item = morph.parse(item)[0]
+            rod[idx] = item.normal_form
+
+        vid = re.split("#",line)[1]
+        vid = re.split(" ",vid)
+        for idx, item in enumerate(vid):
+            item = morph.parse(item)[0]
+            vid[idx] = item.normal_form
+
+
+        wiki_list.append([getstr(rod),getstr(vid)])
 
     for line in d1:
-        words = re.findall(r'[а-яА-Я]+', line)
 
-        main_word = re.split(" - ",words)[0]
-        # main_word = (morph.parse(main_word)[0])
-        # main_word = main_word.normal_form
-        definition = re.split(" - ", words)[0]
 
-        for idx, word in enumerate(definition):
-            word = morph.parse(word)[0]
-            definition[idx] = word.normal_form
+        if re.search(" - ", line)!=None:
+            main_word = re.split(" - ",line)[0]
+            # main_word = (morph.parse(main_word)[0])
+            # main_word = main_word.normal_form
+            # print(main_word)
 
-        # for pair in wiki_list:
-        #     if pair[0] in definition and pair[1] == main_word:
-        #         print(pair)
-        #         print(main_word + " " + definition)
+            definition = re.split(" - ", line)[1]
+            def_words = re.findall(r'[а-яА-Я]+', definition)
+
+            for idx, word in enumerate(def_words):
+                word = morph.parse(word)[0]
+                def_words[idx] = word.normal_form
+
+            for pair in wiki_list:
+                if pair[0] in getstr(def_words) and pair[1] == main_word:
+                    print(pair)
+                    print(main_word + " " + definition)
 
 getsim()
 
+# morph = pymorphy2.MorphAnalyzer()
+# for idx, item in enumerate(main_word):
+#     word = (morph.parse(item)[0])
+#     main_word[idx] = word.normal_form
+# print(main_word)
+# print(' '.join(main_word))
+#
+# if ' '.join(l) in ' '.join(main_word):
+#     print(l)
+#
