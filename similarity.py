@@ -49,15 +49,15 @@ def getstr(list):
 
 def getsim():
     d1 = open("UF_efremova_v2_40_out.txt", "r")
-    out_file = open("wikionary_pos_in_dict.txt", "w")
-    wictionary_file = open("wikionary_hypernyms.txt", "r")
+    out_file = open("wikionary_freq_pairs_pos_in_dict_efremova.txt", "w")
+    wictionary_file = open("wikionary_clear_60k_rod_freq.txt", "r")
 
     morph = pymorphy2.MorphAnalyzer()
 
     wiki_list = []
 
     for line in wictionary_file:
-        wiki_list.append(re.sub("\n", "", line)) # "РОД#ВИД"
+        line = re.sub("\n", "", line) # "РОД#ВИД"
 
         rod = re.split("#",line)[0]
         rod = re.split(" ",rod)
@@ -73,6 +73,7 @@ def getsim():
 
 
         wiki_list.append([getstr(rod),getstr(vid)])
+
 
     for line in d1:
 
@@ -90,10 +91,16 @@ def getsim():
                 word = morph.parse(word)[0]
                 def_words[idx] = word.normal_form
 
+
             for pair in wiki_list:
-                if pair[0] in getstr(def_words) and pair[1] == main_word:
-                    print(pair)
-                    print(main_word + " " + definition)
+
+                if pair[0] in def_words and pair[1] == main_word:
+                #     print(pair[0] + " *in* " + getstr(def_words))
+                #     print(pair[1] + " == " + main_word)
+                #     print(pair)
+                    position = (def_words.index(pair[0])+1)
+                    print(main_word + " = " + definition)
+                    out_file.write(position.__str__()+"\t"+pair[1]+","+pair[0]+"\n")
 
 getsim()
 
