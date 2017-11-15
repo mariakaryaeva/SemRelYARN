@@ -18,6 +18,7 @@ def clear_wikionary_by_freq_list():
 
     wictionary_file = open("wikionary_hypernyms.txt", "r")
 
+    # "золотой" стандарт: проверяем и род, и вид на соотвествтие в Викшинари
     out_file = open("wikionary_clear_60k_freq.txt", "w")
     for line in wictionary_file:
         word1 = re.split("#",line)[0].lower()
@@ -26,6 +27,7 @@ def clear_wikionary_by_freq_list():
             out_file.write(line)
     out_file.close()
 
+    # расширение: проверяем только род на соотвествтие в Викшинари
     out_r_file = open("wikionary_clear_60k_rod_freq.txt", "w")
     for line in wictionary_file:
         word1 = re.split("#",line)[0].lower()
@@ -48,69 +50,70 @@ def getstr(list):
 
 
 def getsim():
-    d1 = open("UF_efremova_v2_40_out.txt", "r")
-    out_file = open("wikionary_freq_pairs_pos_in_dict_efremova.txt", "w")
-    wictionary_file = open("wikionary_clear_60k_rod_freq.txt", "r")
+    wictionary_file = open("wikionary_clear_60k_freq.txt", "r")  # "золотой" стандарт
 
     morph = pymorphy2.MorphAnalyzer()
 
     wiki_list = []
 
     for line in wictionary_file:
-        line = re.sub("\n", "", line) # "РОД#ВИД"
+        line = re.sub("\n", "", line)  # "РОД#ВИД"
 
-        rod = re.split("#",line)[0]
-        rod = re.split(" ",rod)
+        rod = re.split("#", line)[0]
+        rod = re.split(" ", rod)
         for idx, item in enumerate(rod):
             item = morph.parse(item)[0]
             rod[idx] = item.normal_form
 
-        vid = re.split("#",line)[1]
-        vid = re.split(" ",vid)
+        vid = re.split("#", line)[1]
+        vid = re.split(" ", vid)
         for idx, item in enumerate(vid):
             item = morph.parse(item)[0]
             vid[idx] = item.normal_form
 
-
-        wiki_list.append([getstr(rod),getstr(vid)])
-
-
-    for line in d1:
+        wiki_list.append([getstr(rod), getstr(vid)])
 
 
-        if re.search(" - ", line)!=None:
-            main_word = re.split(" - ",line)[0]
-            # main_word = (morph.parse(main_word)[0])
-            # main_word = main_word.normal_form
-            # print(main_word)
+    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final", "UF_ozhshv_final", "UF_efremova_v2", "UF_ushakov_final"]
+    outfpair = ["Wikionary_freq_pairs_pos_in_dict_babenko_v3", "Wikionary_freq_pairs_pos_in_dict_bts_final","Wikionary_freq_pairs_pos_in_dict_mas_final", "Wikionary_freq_pairs_pos_in_dict_ozhshv_final","Wikionary_freq_pairs_pos_in_dict_efremova_v2","Wikionary_freq_pairs_pos_in_dict_ushakov_final"]
 
-            definition = re.split(" - ", line)[1]
-            def_words = re.findall(r'[а-яА-Я]+', definition)
-
-            for idx, word in enumerate(def_words):
-                word = morph.parse(word)[0]
-                def_words[idx] = word.normal_form
+    if len(indict)==len(outfpair):
+        count = len(indict)
 
 
-            for pair in wiki_list:
+    for idx, val in enumerate(indict):
+        d1 = open(val+".txt", "r")
+        out_file = open(outfpair[idx]+".txt", "w")
+        pair_list = []
+        total_pairs = 0
 
-                if pair[0] in def_words and pair[1] == main_word:
-                #     print(pair[0] + " *in* " + getstr(def_words))
-                #     print(pair[1] + " == " + main_word)
-                #     print(pair)
-                    position = (def_words.index(pair[0])+1)
-                    print(main_word + " = " + definition)
-                    out_file.write(position.__str__()+"\t"+pair[1]+","+pair[0]+"\n")
+        for line in d1:
+
+            if re.search(" - ", line)!=None:
+                main_word = re.split(" - ",line)[0]
+
+                definition = re.split(" - ", line)[1]
+                def_words = re.findall(r'[а-яА-Я]+', definition)
+
+                for idx, word in enumerate(def_words):
+                    word = morph.parse(word)[0]
+                    def_words[idx] = word.normal_form
+
+
+                for pair in wiki_list:
+
+                    if pair[0] in def_words and pair[1] == main_word:
+                        if [pair[1],pair[0]] in pair_list:
+                            print("уже в списке: "+ pair[1]+","+pair[0])
+                        else:
+                            pair_list.append([pair[1],pair[0]])
+                            position = (def_words.index(pair[0])+1)
+                            out_file.write(position.__str__()+"\t"+pair[1]+","+pair[0]+"\n")
+                            total_pairs = total_pairs + 1
+
+        print(val)
+        print(total_pairs)
 
 getsim()
 
-# morph = pymorphy2.MorphAnalyzer()
-# for idx, item in enumerate(main_word):
-#     word = (morph.parse(item)[0])
-#     main_word[idx] = word.normal_form
-# print(main_word)
-# print(' '.join(main_word))
-#
-# if ' '.join(l) in ' '.join(main_word):
-#     print(l)
-#
+
