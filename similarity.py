@@ -4,6 +4,8 @@
 import re
 import pymorphy2
 
+# поиск очишенных по частотности пар из Викисловаря
+# результат: файл, около 10 тыс слов, "золотой стандарт": wikionary_clear_60k_freq.txt
 def clear_wikionary_by_freq_list():
     freq_file = open("1grams_nkrya_norm.txt", "r")
     freq_list = []
@@ -36,9 +38,7 @@ def clear_wikionary_by_freq_list():
             out_r_file.write(line)
     out_r_file.close()
 
-# берем словари
-# для каждой пары из викшинари находим "вид-род" в определении.
-# Выдаем пару и позицию (по словам) рода в определении
+
 
 def getstr(list):
     if len(list)==1:
@@ -48,8 +48,10 @@ def getstr(list):
 
 
 
-
-def getsim():
+# берем словари
+# для каждой пары из викшинари находим "вид-род" в главном слове и определении.
+# Выдаем пару и позицию (по словам) рода в определении
+def getWikionaryPairsFromDicts():
     wictionary_file = open("wikionary_clear_60k_freq.txt", "r")  # "золотой" стандарт
 
     morph = pymorphy2.MorphAnalyzer()
@@ -114,6 +116,48 @@ def getsim():
         print(val)
         print(total_pairs)
 
-getsim()
+#getWikionaryPairsFromDicts 15.11.2017
+
+
+
+# количество определений на один термин по всем словарям
+def countDefPerTerms():
+    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final",  "UF_efremova_v2", "UF_ushakov_final"]
+    # "UF_ozhshv_final",
+    outf = open("countDef_ALL_dict.txt", "w")
+    ouftdata = open("Def_ALL_dict.txt", "w")
+
+    for dict in indict:
+        inf = open(dict+".txt", "r")
+        print(dict+".txt")
+
+        TDstore = {}
+
+        for line in inf:
+            if re.split(" - ", line)!=None and len(re.split(" - ", line))>0:
+                term = re.split(" - ", line)[0]
+               # print(line)
+                definition = re.split(" - ", line)[1]
+
+                if term in TDstore:
+                    def_list = TDstore.get(term)
+                    def_list.append(definition)
+                    TDstore[term] = def_list
+
+                else:
+                    # def_list = []
+                    # value = def_list.append(definition)
+                    TDstore[term] = [definition]
+
+        for key, value in TDstore.items():
+            outf.write(key+"\t"+len(value).__str__()+"\n")
+            ouftdata.write(key+"\t"+len(value).__str__()+"\n")
+            for defin in value:
+                ouftdata.write(key + " - " + defin + "\n")
+
+
+
+countDefPerTerms()
+
 
 
