@@ -141,15 +141,24 @@ def countDefPerTerms():
                # print(line)
                 definition = re.split(" - ", line)[1]
 
-                if term in TDstore:
-                    def_list = TDstore.get(term)
-                    def_list.append(definition)
-                    TDstore[term] = def_list
+                if re.search("\",\"", term) != None:
+                    term_spelling = re.split("\",\"", term)
 
+                    for t in term_spelling:
+                        if t in TDstore:
+                            def_list = TDstore.get(t)
+                            def_list.append(definition)
+                            TDstore[t] = def_list
+                        else:
+                            TDstore[t] = [definition]
                 else:
-                    # def_list = []
-                    # value = def_list.append(definition)
-                    TDstore[term] = [definition]
+                    if term in TDstore:
+                        def_list = TDstore.get(term)
+                        def_list.append(definition)
+                        TDstore[term] = def_list
+
+                    else:
+                        TDstore[term] = [definition]
 
     for key, value in TDstore.items():
         outf.write(key+"\t"+len(value).__str__()+"\n")
