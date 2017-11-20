@@ -122,20 +122,22 @@ def getWikionaryPairsFromDicts():
 
 # количество определений на один термин по всем словарям
 def countDefPerTerms():
-    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final",  "UF_efremova_v2", "UF_ushakov_final"]
+    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final",  "UF_efremova_v2", "UF_ushakov_final", "UF_ozhshv_final_latest"]
     # "UF_ozhshv_final",
     outf = open("countDef_ALL_dict.txt", "w")
     ouftdata = open("Def_ALL_dict.txt", "w")
+
+    TDstore = {}
 
     for dict in indict:
         inf = open(dict+".txt", "r")
         print(dict+".txt")
 
-        TDstore = {}
 
         for line in inf:
-            if re.split(" - ", line)!=None and len(re.split(" - ", line))>0:
+            if re.split(" - ", line)!=None and len(re.split(" - ", line))>1:
                 term = re.split(" - ", line)[0]
+                term = re.sub(" ", "", term)
                # print(line)
                 definition = re.split(" - ", line)[1]
 
@@ -149,15 +151,41 @@ def countDefPerTerms():
                     # value = def_list.append(definition)
                     TDstore[term] = [definition]
 
-        for key, value in TDstore.items():
-            outf.write(key+"\t"+len(value).__str__()+"\n")
-            ouftdata.write(key+"\t"+len(value).__str__()+"\n")
-            for defin in value:
-                ouftdata.write(key + " - " + defin + "\n")
+    for key, value in TDstore.items():
+        outf.write(key+"\t"+len(value).__str__()+"\n")
+        ouftdata.write(key+"\t"+len(value).__str__()+"\n")
+        for defin in value:
+            ouftdata.write(key + " - " + defin + "\n")
 
 
 
 countDefPerTerms()
+
+# в ожегове определения смыслов одного слова перечислены в одном определении.
+# экстаз - 1. Исступленно-восторженное состояние  Прийти в э. Говорить что-н. в экстазе. 2. Вид аффективного психического расстройства  П прил. экстатический,  Экстатическая музыка.
+def divideDefinitionInDict():
+    inf = open("UF_ozhshv_final.txt", "r")
+    outf = open("UF_ozhshv_final_latest.txt", "w")
+
+    for line in inf:
+        search = re.search('[А-Яа-я]*( )-', line)
+        if search != None and search.span()[0] == 0:
+            line = re.sub("\n", "", line)
+            term = re.sub(" -", "", search.group())
+            definition = line[search.span()[1]:]
+
+            def_list = re.split('\d[.]', definition)
+            for defin in def_list:
+                if defin == "" or defin == " " or (re.search(" ",defin)!=None and len(defin)<3):
+                    print(defin)
+                else:
+                    outf.write(term + " - " + defin + "\n")
+
+        else:
+            outf.write(line)
+
+
+# divideDefinitionInDict()
 
 
 
