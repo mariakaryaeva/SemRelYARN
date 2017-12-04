@@ -214,7 +214,7 @@ if __name__ == "__main__":
         if line !="":
             origin_line = line[0:-1] # удаляем перенос строки
             origin_line = origin_line
-            print(origin_line)
+            #print(origin_line)
            # print(line)
             hypernym, definition = get_head_word_and_def(origin_line)
             if not hypernym: # неизвестное форматирование словарной статьи
@@ -297,27 +297,31 @@ if __name__ == "__main__":
         #print_def_and_pairs(hypernym, hyponym, hyponym2, origin_line)
 
         def_lst = re.split(" ", definition)
+        print(def_lst)
         count = 0
         first_a = second_a = ""
 
         for word in def_lst:
             if re.search(hyponym.form, word) != None:
+                # print(hyponym.form)
+                if (count + 1)<len(def_lst):
+                    candidate = def_lst[count + 1]
+                    if re.search("род", candidate) != None and re.search("S", candidate) != None:
+                        first_a = re.split("\{", def_lst[count + 1])[0]
+                        print("first_a:" +first_a)
 
-                if count != 0:
-                    if re.search("=A=", def_lst[count - 1]) != None:
-                        first_a = re.split("\{", def_lst[count - 1])[0]
+                # if (count + 1) < len(def_lst):
+                #     if re.search("=A=", def_lst[count + 1]) != None:
+                #         second_a = re.split("\{", def_lst[count + 1])[0]
 
-                if (count + 1) < len(def_lst):
-                    if re.search("=A=", def_lst[count + 1]) != None:
-                        second_a = re.split("\{", def_lst[count + 1])[0]
 
             count = count + 1
-        # print(hypernym)
+        print("hypernym: " + hypernym)
         # print(first_a + " " + hyponym.to_string() + " " + second_a)
         # print(definition)
         # print("\n")
 
-        if first_a != "" or hyponym.form != "":
+        if first_a != "" and hyponym.form != "":
             hyponym_gr = morph.parse(hyponym.form)[0]
             first_a_tmp = morph.parse(first_a)[0]
             # print(first_a_tmp)
@@ -327,19 +331,20 @@ if __name__ == "__main__":
             # print(hyponym_gr.tag.number)
             # print(hyponym_gr.tag.gender)
             # print("first_a: "+first_a)
-            try:
-                if hyponym_gr.tag.gender != None and hyponym_gr.tag.number != None and first_a_tmp.tag.POS != "NOUN":
-                   # print(first_a_gr)
-                    if first_a_tmp.tag.gender != None:
-                        first_a_form = first_a_gr.inflect({hyponym_gr.tag.gender, hyponym_gr.tag.number}).word
-                    else:
-                        first_a_form = first_a_gr.inflect({hyponym_gr.tag.number}).word
-
-            except AttributeError:
-                multi_outf_attr_err.write(hypernym + " - " + first_a + " " +hyponym.to_string() + "\n")
-            else:
-                if re.search("\{\}", hyponym.to_string())==None:
-                    multi_outf.write(hypernym + " - " + first_a_form + " " +hyponym.to_string() + "\n")
+            # try:
+            #     if hyponym_gr.tag.gender != None and hyponym_gr.tag.number != None and first_a_tmp.tag.POS != "NOUN":
+            #         print("hyponym_gr.tag.number: "+hyponym_gr.tag.number)
+            #         if first_a_tmp.tag.gender != None:
+            #             first_a_form = first_a_gr.inflect({hyponym_gr.tag.gender, hyponym_gr.tag.number}).word
+            #         else:
+            #             first_a_form = first_a_gr.inflect({hyponym_gr.tag.number}).word
+            #
+            # except AttributeError:
+            #     multi_outf_attr_err.write(hypernym + " - " + first_a + " " +hyponym.to_string() + "\n")
+            # else:
+            #     if re.search("\{\}", hyponym.to_string())==None:
+            multi_outf.write(hypernym + " - " + hyponym.form + " " + first_a + " {" + hyponym.form +"}\n")
+            print(hypernym + " - " + first_a  + " " + hyponym.to_string() )
 
 
 
