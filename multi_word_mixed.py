@@ -366,11 +366,3 @@ if __name__ == "__main__":
             multi_outf.write(hypernym + " - " + hyponym.form + " " + first_a + " {" + hyponym.form +"}\n")
             print(hypernym + " - " + first_a  + " " + hyponym.to_string() )
 
-
-
-        # if re.search("\{\}", hyponym.to_string())==None:
-        #     outf.write('{0} - {1}\n'.format(hypernym, hyponym.to_string()))
-        # else:
-        #     outf_err.write(hypernym + "\n")
-
-
