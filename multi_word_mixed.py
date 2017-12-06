@@ -302,7 +302,8 @@ if __name__ == "__main__":
         first_a = second_a = ""
 
         for word in def_lst:
-            if re.search(hyponym.form, word) != None:
+            if re.search(hyponym.form, word) != None and hyponym.form!="":
+                s = ""
                 # сущ предлог сущ = Прибор для вычисления
                 if (count + 2)<len(def_lst):
                     f_w = def_lst[count + 1]
@@ -324,7 +325,17 @@ if __name__ == "__main__":
                     if re.search("род", f_w) != None and re.search("S", f_w) != None and re.search("=A=род,", s_w) != None:
                         f_w = re.split("\{", def_lst[count + 1])[0]
                         s_w = re.split("\{", def_lst[count + 2])[0]
-                        multi_outf.write(hypernym + " - " + hyponym.form + " " + f_w + " " + s_w +" {" + hyponym.form + "} \t type:NNA \n")
+                        if (count + 3)<len(def_lst):
+                            #добавлем еще одно существительное NNAN:
+                            th_w = re.split("\{", def_lst[count + 3])[0]
+                            if re.search("S", def_lst[count + 3]) != None and re.search("род,", def_lst[count + 3]) != None:
+                                multi_outf.write(
+                                    hypernym + " - " + hyponym.form + " " + f_w + " " + s_w + " " + th_w + " {" + hyponym.form + "} \t type:NNAN \n")
+                            else:
+                                multi_outf.write(hypernym + " - " + hyponym.form + " " + f_w + " " + s_w +" {" + hyponym.form + "} \t type:NNA \n")
+                        else:
+                            multi_outf.write(
+                                hypernym + " - " + hyponym.form + " " + f_w + " " + s_w + " {" + hyponym.form + "} \t type:NNA \n")
 
                 if (count -2) > 0:
                     p_w = def_lst[count - 1]
@@ -334,8 +345,8 @@ if __name__ == "__main__":
                     if re.search("=A=род,", p_w) != None and re.search("=A=род,", pp_w) != None:
                         pp_w = re.split("\{", def_lst[count - 2])[0]
                         p_w = re.split("\{", def_lst[count - 1])[0]
-                        multi_outf.write(hypernym + " - " + p_w + " " + pp_w + " " + hyponym.form + " {" + hyponym.form + "} \t type:AAN \n")
-                        print(hypernym + " - " + p_w + " " + pp_w + " " + hyponym.form + " {" + hyponym.form + "} \t type:AAN \n")
+                        multi_outf.write(hypernym + " - " + pp_w + " " + p_w + " " + hyponym.form + " {" + hyponym.form + "} \t type:AAN \n")
+                        # print(hypernym + " - " + p_w + " " + pp_w + " " + hyponym.form + " {" + hyponym.form + "} \t type:AAN \n")
 
 
 
