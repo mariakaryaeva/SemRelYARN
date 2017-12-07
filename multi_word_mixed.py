@@ -203,11 +203,11 @@ def is_false_noun(lower_form):
 
 # основная функция программы
 if __name__ == "__main__":
-    add = "UF_wikt_"
+    add = ""
     inf = open("dict-mystem.txt", "r")
     outf = open(add+"total_1_word.txt","w")
     outf_err = open(add+"no_relation.txt","w")
-    multi_outf = open(add+"multi_words.txt", "w")
+    multi_outf = open("multi_word_mixed_.txt", "w")
     #multi_outf_err = open(add+"multi_res_err.txt", "w")
     multi_outf_attr_err = open(add+"multi_res_attr_err.txt", "w")
     for line in inf:
@@ -342,7 +342,7 @@ if __name__ == "__main__":
                     pp_w = def_lst[count - 2]
 
                     # <прил прил> сущ = Острое заразное заболевание
-                    if re.search("=A=род,", p_w) != None and re.search("=A=род,", pp_w) != None:
+                    if re.search("=A=", p_w) != None and re.search("=A=", pp_w) != None:
                         pp_w = re.split("\{", def_lst[count - 2])[0]
                         p_w = re.split("\{", def_lst[count - 1])[0]
                         multi_outf.write(hypernym + " - " + pp_w + " " + p_w + " " + hyponym.form + " {" + hyponym.form + "} \t type:AAN \n")
@@ -355,12 +355,12 @@ if __name__ == "__main__":
                     # <прил> сущ <сущ> = Горизонтальный отрезок линии
                     p_w = def_lst[count - 1]
                     f_w = def_lst[count + 1]
-                    if re.search("=A=род,", p_w) != None and re.search("род", f_w) != None and re.search("S", f_w) != None:
+                    if re.search("=A=", p_w) != None and re.search("род", f_w) != None and re.search("S", f_w) != None:
                         f_w = re.split("\{", def_lst[count + 1])[0]
                         p_w = re.split("\{", def_lst[count - 1])[0]
                         multi_outf.write(hypernym + " - " + p_w + " " + hyponym.form + " " + f_w + " {" + hyponym.form + "} \t type:ANN \n")
                         print(hypernym + " - " + p_w + " " + hyponym.form + " " + f_w + " {" + hyponym.form + "} \t type:ANN \n")
-
+                break
 
 
 
