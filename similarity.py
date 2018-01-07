@@ -76,7 +76,10 @@ def getWikionaryPairsFromDicts():
         wiki_list.append([getstr(rod), getstr(vid)])
 
 
-    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final", "UF_ozhshv_final", "UF_efremova_v2", "UF_ushakov_final"]
+    # indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final_latest", "UF_ozhshv_final", "UF_efremova_v2", "UF_ushakov_final"]
+    indict = ["UF_babenko_v3", "UF_bts_final_latest", "UF_mas_final_latest", "UF_ozhshv_final_latest", "UF_efremova_v2_latest",
+              "UF_ushakov_final_latest"]
+
     outfpair = ["Wikionary_freq_pairs_pos_in_dict_babenko_v3", "Wikionary_freq_pairs_pos_in_dict_bts_final","Wikionary_freq_pairs_pos_in_dict_mas_final", "Wikionary_freq_pairs_pos_in_dict_ozhshv_final","Wikionary_freq_pairs_pos_in_dict_efremova_v2","Wikionary_freq_pairs_pos_in_dict_ushakov_final"]
 
     if len(indict)==len(outfpair):
@@ -116,13 +119,14 @@ def getWikionaryPairsFromDicts():
         print(val)
         print(total_pairs)
 
-#getWikionaryPairsFromDicts 15.11.2017
+# getWikionaryPairsFromDicts()
+# 15.11.2017
 
 
 
 # количество определений на один термин по всем словарям
 def countDefPerTerms():
-    indict = ["UF_babenko_v3", "UF_bts_final", "UF_mas_final",  "UF_efremova_v2", "UF_ushakov_final", "UF_ozhshv_final_latest"]
+    indict = ["UF_babenko_v3", "UF_bts_final_latest", "UF_mas_final_latest",  "UF_efremova_v2_latest", "UF_ushakov_final_latest", "UF_ozhshv_final_latest"]
     # "UF_ozhshv_final",
     outf = open("countDef_ALL_dict.txt", "w")
     ouftdata = open("Def_ALL_dict.txt", "w")
@@ -164,7 +168,8 @@ def countDefPerTerms():
         outf.write(key+"\t"+len(value).__str__()+"\n")
         ouftdata.write(key+"\t"+len(value).__str__()+"\n")
         for defin in value:
-            ouftdata.write(key + " - " + defin + "\n")
+            defin = re.sub("\n", "", defin)
+            ouftdata.write(key + " - " + defin+ "\n")
 
 
 
@@ -198,3 +203,133 @@ def divideDefinitionInDict():
 
 
 
+def divideDefinitionInDictMAS():
+    inf = open("UF_mas_final.txt", "r")
+    outf = open("UF_mas_final_latest.txt", "w")
+
+
+    for line in inf:
+        line = re.sub("\n", "", line)
+        term = re.split(" - ", line)[0]
+        common_def = re.split(" - ", line)[1]
+
+        if re.search("\",\"", term)!=None:
+            terms_list = re.split("\",\"", term)
+            for t in terms_list:
+                if re.search("\.\",\"", common_def)!=None:
+                    def_list  = re.split("\.\",\"", common_def)
+                    for definition in def_list:
+                        outf.write(t + " - " + definition+"\n")
+                else:
+                    outf.write(t + " - "+ common_def + "\n")
+        else:
+            if re.search("\.\",\"", common_def) != None:
+                def_list = re.split("\.\",\"", common_def)
+                for definition in def_list:
+                    outf.write(term + " - " + definition + "\n")
+            else:
+                outf.write(line + "\n")
+
+
+
+# divideDefinitionInDictMAS()
+
+
+def divideDefinitionInDictUSH():
+    inf = open("UF_ushakov_final.txt", "r")
+    outf = open("UF_ushakov_final_latest.txt", "w")
+
+
+    for line in inf:
+        line = re.sub("\n", "", line)
+        term = re.split(" - ", line)[0]
+        common_def = re.split(" - ", line)[1]
+
+        if re.search("\",\"", term)!=None:
+            terms_list = re.split("\",\"", term)
+            for t in terms_list:
+                if re.search("\.\",\"", common_def)!=None:
+                    def_list  = re.split("\.\",\"", common_def)
+                    for definition in def_list:
+                        outf.write(t + " - " + definition+"\n")
+                else:
+                    outf.write(t + " - "+ common_def + "\n")
+        else:
+            if re.search("\.\",\"", common_def) != None:
+                def_list = re.split("\.\",\"", common_def)
+                for definition in def_list:
+                    outf.write(term + " - " + definition + "\n")
+            else:
+                outf.write(line + "\n")
+
+# divideDefinitionInDictUSH()
+
+
+
+
+
+
+def divideDefinitionInDictEFR():
+    inf = open("UF_efremova_v2.txt", "r")
+    outf = open("UF_efremova_v2_latest.txt", "w")
+
+
+    for line in inf:
+        line = re.sub("\n", "", line)
+        term = re.split(" - ", line)[0]
+        common_def = re.split(" - ", line)[1]
+
+        if re.search("\",\"", term)!=None:
+            terms_list = re.split("\",\"", term)
+            for t in terms_list:
+                if re.search("\.\",\"", common_def)!=None:
+                    def_list  = re.split("\.\",\"", common_def)
+                    for definition in def_list:
+                        outf.write(t + " - " + definition+"\n")
+                else:
+                    outf.write(t + " - "+ common_def + "\n")
+        else:
+            if re.search("\.\",\"", common_def) != None:
+                def_list = re.split("\.\",\"", common_def)
+                for definition in def_list:
+                    outf.write(term + " - " + definition + "\n")
+            else:
+                outf.write(line + "\n")
+
+
+# divideDefinitionInDictEFR()
+
+
+
+
+
+
+def divideDefinitionInDictBTS():
+    inf = open("UF_bts_final.txt", "r")
+    outf = open("UF_bts_final_latest.txt", "w")
+
+
+    for line in inf:
+        line = re.sub("\n", "", line)
+        term = re.split(" - ", line)[0]
+        common_def = re.split(" - ", line)[1]
+
+        if re.search("\",\"", term)!=None:
+            terms_list = re.split("\",\"", term)
+            for t in terms_list:
+                if re.search("\.\",\"", common_def)!=None:
+                    def_list  = re.split("\.\",\"", common_def)
+                    for definition in def_list:
+                        outf.write(t + " - " + definition+"\n")
+                else:
+                    outf.write(t + " - "+ common_def + "\n")
+        else:
+            if re.search("\.\",\"", common_def) != None:
+                def_list = re.split("\.\",\"", common_def)
+                for definition in def_list:
+                    outf.write(term + " - " + definition + "\n")
+            else:
+                outf.write(line + "\n")
+
+
+# divideDefinitionInDictBTS()
