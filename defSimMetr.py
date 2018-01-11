@@ -39,10 +39,11 @@ for line in inf:
             other = re.split(" = ", line)[1]
             # re.sub("\t", "",
             term = re.split(" - ", other)[0]
+            term = re.sub("\t","",term)
             defin = re.split(" - ",other)[1]
         else:
             extractions = ""
-            term = re.split(" - ", line)[0]
+            term = re.split("\t",re.split(" - ", line)[0])[1]
             defin = re.split(" - ",line)[1]
 
         lst = []
