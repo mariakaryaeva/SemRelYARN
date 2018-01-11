@@ -25,21 +25,33 @@ from py_stringmatching import simfunctions, tokenizers
 
 # inf = open("/Users/maria/PycharmProjects/SemRelYARN/Def_ALL_dict.txt", "r")
 # outf = open("/Users/maria/PycharmProjects/SemRelYARN/cosine_sim_defs.txt", "w")
-inf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/Def_ALL_dict_standart_60k_no_dubl_clean.txt", "r")
-outf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/simMeas_Def_dicts_gs_60k_clean.txt", "w")
+
+inf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/Def_ALL_dict_standart_60k_no_dubl_clean_num_up.txt", "r")
+# inf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/Def_ALL_dict_standart_60k_no_dubl_clean.txt", "r")
+# outf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/simMeas_Def_dicts_gs_60k_clean_up.txt", "w")
+outf = open("/Users/maria/PycharmProjects/SemRelYARN/60_freq/simMeas_Def_dicts_gs_60k_clean_up.txt", "w")
 
 dict = {}
 for line in inf:
-    if re.search("\t", line)==None:
-        term = re.split(" - ",line)[0]
-        defin = re.split(" - ",line)[1]
+    if re.search(" - ", line)!=None:
+        if re.search(" = ",line)!=None:
+            extractions = re.split(" = ",line)[0]
+            other = re.split(" = ", line)[1]
+            # re.sub("\t", "",
+            term = re.split(" - ", other)[0]
+            defin = re.split(" - ",other)[1]
+        else:
+            extractions = ""
+            term = re.split(" - ", line)[0]
+            defin = re.split(" - ",line)[1]
+
         lst = []
 
         if term in dict:
             lst = dict[term]
-            lst.append(defin)
+            lst.append(extractions+" = "+defin)
         else:
-            lst.append(defin)
+            lst.append(extractions+" = "+defin)
             dict[term] = lst
 
 lab = {}
@@ -51,9 +63,9 @@ for key, value in dict.items():
             G.add_node(idx)
             for idy, defY in enumerate(value):
                 if idy != idx:
-                    x_clean_def = re.findall("([а-яА-Я]+)", defX)
+                    x_clean_def = re.findall("([а-яА-Я]+)", re.split(" = ", defX)[1])
                     defX_clean =' '.join(x_clean_def)
-                    y_clean_def = re.findall("([а-яА-Я]+)", defY)
+                    y_clean_def = re.findall("([а-яА-Я]+)", re.split(" = ", defY)[1])
                     defY_clean = ' '.join(y_clean_def)
                     f = simfunctions.cosine(tokenizers.whitespace(defX_clean), tokenizers.whitespace(defY_clean))
 
